@@ -24,6 +24,23 @@
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+      <Content Remove="bin\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="bin\Debug\net7.0\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="bin\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="bin\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="bin\**" />
     </ItemGroup>
 
 </Project>
