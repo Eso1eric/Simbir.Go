@@ -2,6 +2,7 @@ namespace Simbir.GO.Contract.Responses;
 
 public class TransportInRangeResponse
 {
+    public int Id { get; set; }
     public bool CanBeRented { get; set; }
     public string TransportType { get; set; }
     public string Model { get; set; }

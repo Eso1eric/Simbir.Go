@@ -12,7 +12,7 @@ public static class DbInitializer
         if (context.Accounts.Any())
             return;
 
-        var adminAccount = new Account() { UserName = "Admin", CreateDate = DateTime.UtcNow, Balance = 2000.50, IsAdmin = true };
+        var adminAccount = new Account() { UserName = "Admin", CreateDate = DateTime.UtcNow, Balance = 2000.50, IsAdmin = true, SecurityStamp = Guid.NewGuid().ToString()};
         adminAccount.NormalizedUserName = userManager.NormalizeName(adminAccount.UserName);
         adminAccount.PasswordHash = userManager.PasswordHasher.HashPassword(adminAccount, "123");
         var accounts = new Account[] { adminAccount };

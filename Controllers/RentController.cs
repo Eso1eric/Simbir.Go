@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Simbir.GO.Contract.Requests;
 using Simbir.GO.Contract.Responses;
 using Simbir.GO.Data;
 using Simbir.GO.Model;
@@ -33,6 +32,7 @@ public class RentController : ControllerBase
         return transport.Any()
             ? Ok(transport.Select(e => new TransportInRangeResponse()
             {
+                Id = e.Id,
                 CanBeRented = e.CanBeRented,
                 TransportType = e.TransportType,
                 Model = e.Model,
@@ -102,6 +102,7 @@ public class RentController : ControllerBase
 
         var rent = new Rent()
         {
+            Id = Guid.NewGuid(),
             TransportId = transportId,
             AccountId = user.Id,
             TimeStart = DateTime.UtcNow,
@@ -115,8 +116,8 @@ public class RentController : ControllerBase
 
         await _context.Rents.AddAsync(rent);
         await _context.SaveChangesAsync();
-        
-        return Ok("Success!");
+
+        return Ok($"Success! Your rent id: {rent.Id}");
     }
 
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -131,6 +132,9 @@ public class RentController : ControllerBase
         if (rent.AccountId != user.Id)
             return NotFound();
 
+        if (rent.TimeEnd != null)
+            return BadRequest("This rent has already ended!");
+
         var transport = await _context.Transports.FindAsync(rent.TransportId);
         
         rent.TimeEnd = DateTime.UtcNow;
@@ -139,9 +143,11 @@ public class RentController : ControllerBase
         transport.CanBeRented = true;
         transport.Latitude = lat;
         transport.Longitude = @long;
-        
+        user.Balance -= rent.FinalPrice.Value;
+
+        await _userManager.UpdateAsync(user);
         await _context.SaveChangesAsync();
-        
+
         return Ok("Rent ended.");
     }
 }
